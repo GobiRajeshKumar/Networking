@@ -1,9 +1,8 @@
 import Foundation
 
-public struct MyNetworking {
+public class MyNetworking {
 
-    public init() {
-    }
+    public init() { }
     
     public func downloadData(fromURL url: URL, completionHandler: @escaping (_ data: Data?) -> Void) {
         URLSession.shared.dataTask(with: url) { (data, response, error) in
