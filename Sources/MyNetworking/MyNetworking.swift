@@ -2,7 +2,7 @@ import Foundation
 
 public class MyNetworking {
     
-    static let shared = MyNetworking()
+    public static let shared = MyNetworking()
 
     public init() { }
     
