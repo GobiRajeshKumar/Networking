@@ -1,8 +1,6 @@
 import Foundation
 
 public class MyNetworking {
-    
-    public static let shared = MyNetworking()
 
     public init() { }
     
