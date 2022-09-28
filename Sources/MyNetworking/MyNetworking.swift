@@ -4,6 +4,8 @@ public class MyNetworking {
 
     public init() { }
     
+    public static shared = MyNetworking()
+    
     public func downloadData(fromURL url: URL, completionHandler: @escaping (_ data: Data?) -> Void) {
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard
