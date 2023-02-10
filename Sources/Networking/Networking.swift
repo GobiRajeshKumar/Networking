@@ -1,10 +1,10 @@
 import Foundation
 
-public class MyNetworking {
+public class Networking {
 
     public init() { }
     
-    public static let shared = MyNetworking()
+    public static let shared = Networking()
     
     public func downloadData(fromURL url: URL, completionHandler: @escaping (_ data: Data?) -> Void) {
         URLSession.shared.dataTask(with: url) { (data, response, error) in
