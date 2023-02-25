@@ -13,7 +13,6 @@ public class Networking {
                 error == nil,
                 let response = response as? HTTPURLResponse,
                 response.statusCode >= 200 && response.statusCode < 300 else {
-                print("Error downloading data.")
                 completionHandler(nil)
                 return
             }
@@ -24,17 +23,19 @@ public class Networking {
     }
     
     private enum NetworkError: Error {
-        case urlError
-        case responseError
-        case error
+        case badURL
+        case badResponse
+        case errorDecodingData
+        case invalidError
     }
     
     @available(iOS 15.0, *)
     @available(macOS 12.0, *)
-    public func downloadData<T: Codable>(from url: String, data: T) async throws -> T  {
-        guard let url = URL(string: url) else { throw NetworkError.urlError }
+    public func fetch<T: Codable>(from url: String) async throws -> [T]  {
+        guard let url = URL(string: url) else { throw NetworkError.badURL }
         let (data, response) = try await URLSession.shared.data(from: url, delegate: nil)
-        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { throw NetworkError.responseError }
-        return try JSONDecoder().decode(T.self, from: data)
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { throw NetworkError.badResponse }
+        guard let object = try? JSONDecoder().decode([T].self, from: data) else { throw NetworkError.errorDecodingData }
+        return object
     }
 }
