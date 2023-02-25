@@ -29,13 +29,46 @@ public class Networking {
         case invalidError
     }
     
+    public enum HttpMethods: String {
+        case POST, GET, PUT, DELETE
+    }
+    
+    public enum MIMEType: String {
+        case JSON = "application/json"
+    }
+    
+    public enum HttpHeaders: String {
+        case contentType = "Content-Type"
+    }
+    
     @available(iOS 15.0, *)
-    @available(macOS 12.0, *)
-    public func fetch<T: Codable>(from urlString: String) async throws -> [T]  {
-        guard let url = URL(string: urlString) else { throw NetworkError.badURL }
+    public func fetchData<T: Codable>(from urlString: String) async throws -> [T]  {
+        guard let url = URL(string: urlString) else {
+            throw NetworkError.badURL
+        }
         let (data, response) = try await URLSession.shared.data(from: url, delegate: nil)
-        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { throw NetworkError.badResponse }
-        guard let object = try? JSONDecoder().decode([T].self, from: data) else { throw NetworkError.errorDecodingData }
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+            throw NetworkError.badResponse
+        }
+        guard let object = try? JSONDecoder().decode([T].self, from: data) else {
+            throw NetworkError.errorDecodingData
+        }
         return object
+    }
+    
+    @available(iOS 15.0, *)
+    public func sendData<T: Codable>(from urlString: String, object: T, httpMethod: HttpMethods) async throws {
+        guard let url = URL(string: urlString) else {
+            throw NetworkError.badURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = httpMethod.rawValue
+        request.addValue(MIMEType.JSON.rawValue, forHTTPHeaderField: HttpHeaders.contentType.rawValue)
+        request.httpBody = try? JSONEncoder().encode(object)
+        
+        let (_, response) = try await URLSession.shared.data(for: request)
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+            throw NetworkError.badResponse
+        }
     }
 }
